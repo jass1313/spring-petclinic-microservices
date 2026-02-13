@@ -32,10 +32,27 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Config Server
+      - name: Build & Push All Services
         run: |
-          docker build -t $DOCKER_USERNAME/config-server:$VERSION \
-            --build-arg ARTIFACT_NAME=spring-petclinic-config-server/target/spring-petclinic-config-server-$VERSION \
-            --build-arg EXPOSED_PORT=8888 \
-            -f docker/Dockerfile .
-          docker push $DOCKER_USERNAME/config-server:$VERSION
+          SERVICES=(
+            config-server:8888
+            discovery-server:8761
+            api-gateway:8080
+            customers-service:8081
+            visits-service:8082
+            vets-service:8083
+            admin-server:9090
+            genai-service:8084
+          )
+
+          for SERVICE in "${SERVICES[@]}"; do
+            NAME=$(echo $SERVICE | cut -d':' -f1)
+            PORT=$(echo $SERVICE | cut -d':' -f2)
+
+            docker build -t $DOCKER_USERNAME/$NAME:$VERSION \
+              --build-arg ARTIFACT_NAME=spring-petclinic-$NAME/target/spring-petclinic-$NAME-$VERSION \
+              --build-arg EXPOSED_PORT=$PORT \
+              -f docker/Dockerfile .
+
+            docker push $DOCKER_USERNAME/$NAME:$VERSION
+          done
