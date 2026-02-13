@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: visits-service
-          image: spring-petclinic-visits-service:local #Docker Image name which is mentioned in docker-compose.yml
-          imagePullPolicy: Never
+          image: jasbeer0013/visits-service:4.0.1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
 ---

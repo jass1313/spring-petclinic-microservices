@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: customers-service
-          image: spring-petclinic-customers-service:local #Docker Image name which is mentioned in docker-compose.yml
-          imagePullPolicy: Never
+          image: jasbeer0013/customers-service:4.0.1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
 ---

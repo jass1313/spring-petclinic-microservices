@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: spring-petclinic-api-gateway:local #Docker Image name which is mentioned in docker-compose.yml
-          imagePullPolicy: Never
+          image: jasbeer0013/api-gateway:4.0.1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---

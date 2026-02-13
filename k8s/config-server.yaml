@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: config-server
-          image: spring-petclinic-config-server:local #Docker Image name which is mentioned in docker-compose.yml
-          imagePullPolicy: Never
+          image: jasbeer0013/config-server:4.0.1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8888
 ---
