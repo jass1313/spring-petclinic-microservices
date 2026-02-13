@@ -31,14 +31,16 @@ jobs:
 
       - name: Build & Push Images
         run: |
-          SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
-
-          for SERVICE in "${SERVICES[@]}"
-          do
+            SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
+            
+            for SERVICE in "${SERVICES[@]}"
+            do
             docker buildx build \
-              --platform linux/amd64 \
-              -t $DOCKER_USERNAME/$SERVICE:$VERSION \
-              --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION \
-              -f docker/Dockerfile . \
-              --push
-          done
+            --platform linux/amd64 \
+            -t $DOCKER_USERNAME/$SERVICE:$VERSION \
+            --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
+            --build-arg EXPOSED_PORT=8080 \
+            -f docker/Dockerfile . \
+            --push
+            done
+
