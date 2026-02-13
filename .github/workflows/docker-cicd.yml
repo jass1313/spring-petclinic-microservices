@@ -1,45 +1,54 @@
-name: CI/CD - Build, Push & Deploy
+name: CI/CD - Build & Push Docker Images
 
 on:
   push:
-    branches:
-      - main-mydockerhub-CICD
 
-env:
-  DOCKER_USERNAME: jasbeer0013
-  VERSION: 4.0.1
+    VERSION: 4.0.1
 
 jobs:
-  build-push-deploy:
-    runs-on: self-hosted
+  build-and-push:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Build JAR
+      - name: Build JAR Files
         run: ./mvnw clean package -DskipTests
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Images
+      - name: Build & Push All Services
         run: |
-          SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
+          SERVICES=(
+            config-server:8888
+            discovery-server:8761
+            api-gateway:8080
+            customers-service:8081
+            visits-service:8082
+            vets-service:8083
+            admin-server:9090
+            genai-service:8084
+          )
 
           for SERVICE in "${SERVICES[@]}"; do
-            docker build -t $DOCKER_USERNAME/$SERVICE:$VERSION \
-              --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION \
-              --build-arg EXPOSED_PORT=8080 \
-              -f docker/Dockerfile .
-            docker push $DOCKER_USERNAME/$SERVICE:$VERSION
-          done
+            NAME=$(echo $SERVICE | cut -d':' -f1)
+            PORT=$(echo $SERVICE | cut -d':' -f2)
 
-      - name: Deploy to Local Kubernetes
-        run: |
-          kubectl apply -f k8s/
-          kubectl rollout restart deployment -n petclinic
+            docker build -t $DOCKER_USERNAME/$NAME:$VERSION \
+              --build-arg ARTIFACT_NAME=spring-petclinic-$NAME/target/spring-petclinic-$NAME-$VERSION \
+              --build-arg EXPOSED_PORT=$PORT \
+              -f docker/Dockerfile .
+
+            docker push $DOCKER_USERNAME/$NAME:$VERSION
+          done
