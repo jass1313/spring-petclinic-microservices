@@ -1,161 +1,152 @@
 services:
+
   config-server:
-    image: springcommunity/spring-petclinic-config-server
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-config-server/target/spring-petclinic-config-server-4.0.1 #JAR file path
+        EXPOSED_PORT: 8888
+    image: spring-petclinic-config-server:local # docker Image file export name
     container_name: config-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+    ports:
+      - 8888:8888
+
     healthcheck:
       test: ["CMD", "curl", "-I", "http://config-server:8888"]
       interval: 5s
       timeout: 5s
       retries: 10
-    ports:
-     - 8888:8888
 
   discovery-server:
-    image: springcommunity/spring-petclinic-discovery-server
-    container_name: discovery-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-discovery-server/target/spring-petclinic-discovery-server-4.0.1
+        EXPOSED_PORT: 8761
+    image: spring-petclinic-discovery-server:local
+    ports:
+      - 8761:8761
     depends_on:
       config-server:
         condition: service_healthy
-    ports:
-     - 8761:8761
 
   customers-service:
-    image: springcommunity/spring-petclinic-customers-service
-    container_name: customers-service
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-customers-service/target/spring-petclinic-customers-service-4.0.1
+        EXPOSED_PORT: 8081
+    image: spring-petclinic-customers-service:local
+    ports:
+      - 8081:8081
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-    ports:
-    - 8081:8081
+        condition: service_started
 
   visits-service:
-    image: springcommunity/spring-petclinic-visits-service
-    container_name: visits-service
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-visits-service/target/spring-petclinic-visits-service-4.0.1
+        EXPOSED_PORT: 8082
+    image: spring-petclinic-visits-service:local
+    ports:
+      - 8082:8082
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-    ports:
-     - 8082:8082
+        condition: service_started
 
   vets-service:
-    image: springcommunity/spring-petclinic-vets-service
-    container_name: vets-service
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-vets-service/target/spring-petclinic-vets-service-4.0.1
+        EXPOSED_PORT: 8083
+    image: spring-petclinic-vets-service:local
+    ports:
+      - 8083:8083
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-    ports:
-     - 8083:8083
-
+        condition: service_started
 
   genai-service:
-    image: springcommunity/spring-petclinic-genai-service
-    container_name: genai-service
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-genai-service/target/spring-petclinic-genai-service-4.0.1
+        EXPOSED_PORT: 8084
+    image: spring-petclinic-genai-service:local
+    ports:
+      - 8084:8084
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
       - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
-    deploy:
-      resources:
-        limits:
-          memory: 512M
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-    ports:
-     - 8084:8084
-
+        condition: service_started
 
   api-gateway:
-    image: springcommunity/spring-petclinic-api-gateway
-    container_name: api-gateway
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-4.0.1
+        EXPOSED_PORT: 8080
+    image: spring-petclinic-api-gateway:local
+    ports:
+      - 8080:8080
     depends_on:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
+        condition: service_started
+
+  admin-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARTIFACT_NAME: spring-petclinic-admin-server/target/spring-petclinic-admin-server-4.0.1
+        EXPOSED_PORT: 9090
+    image: spring-petclinic-admin-server:local
     ports:
-     - 8080:8080
+      - 9090:9090
+
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
 
   tracing-server:
     image: openzipkin/zipkin
     container_name: tracing-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
     ports:
-     - 9411:9411
-
-  admin-server:
-    image: springcommunity/spring-petclinic-admin-server
-    container_name: admin-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    ports:
-     - 9090:9090
-
-  ## Grafana / Prometheus
+      - 9411:9411
 
   grafana-server:
     build: ./docker/grafana
     container_name: grafana-server
-    deploy:
-      resources:
-        limits:
-          memory: 256M
     ports:
-    - 3030:3000
+      - 3030:3000
 
   prometheus-server:
     build: ./docker/prometheus
     container_name: prometheus-server
-    deploy:
-      resources:
-        limits:
-          memory: 256M
     ports:
-    - 9091:9090
+      - 9091:9090

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vets-service
+  namespace: petclinic
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vets-service
+  template:
+    metadata:
+      labels:
+        app: vets-service
+    spec:
+      containers:
+        - name: vets-service
+          image: spring-petclinic-vets-service:local #Docker Image name which is mentioned in docker-compose.yml
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vets-service
+  namespace: petclinic
+spec:
+  selector:
+    app: vets-service
+  ports:
+    - port: 8081
