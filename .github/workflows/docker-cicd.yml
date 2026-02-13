@@ -1,9 +1,9 @@
-name: CI/CD - Build, Push & Deploy
+name: CI/CD - Build & Push
 
 on:
   push:
     branches:
-      - main-mydockerhub-CICD
+      - main
 
 env:
   DOCKER_USERNAME: jasbeer0013
@@ -26,21 +26,22 @@ jobs:
       - name: Build JARs
         run: ./mvnw clean package -DskipTests
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build & Push Images
         run: |
-            SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
-            
-            for SERVICE in "${SERVICES[@]}"
-            do
-            docker buildx build \
-            --platform linux/amd64 \
-            -t $DOCKER_USERNAME/$SERVICE:$VERSION \
-            --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
-            --build-arg EXPOSED_PORT=8080 \
-            -f docker/Dockerfile . \
-            --push
-            done
+          SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service)
 
+          for SERVICE in "${SERVICES[@]}"; do
+            docker buildx build \
+              --platform linux/amd64 \
+              -t $DOCKER_USERNAME/$SERVICE:$VERSION \
+              --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
+              --build-arg EXPOSED_PORT=8080 \
+              -f docker/Dockerfile . \
+              --push
+          done
