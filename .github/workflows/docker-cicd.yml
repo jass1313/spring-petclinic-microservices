@@ -8,6 +8,7 @@ on:
 env:
   DOCKER_USERNAME: jasbeer0013
   VERSION: 4.0.1
+  DOCKERVERSION: 4.0.2
 
 jobs:
   build-and-push:
@@ -37,7 +38,7 @@ jobs:
             do
             docker buildx build \
             --platform linux/amd64 \
-            -t $DOCKER_USERNAME/$SERVICE:$VERSION \
+            -t $DOCKER_USERNAME/$SERVICE:$DOCKERVERSION \
             --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
             --build-arg EXPOSED_PORT=8080 \
             -f docker/Dockerfile . \
