@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-config-server/target/spring-petclinic-config-server-4.0.2 #JAR file path
+        ARTIFACT_NAME: spring-petclinic-config-server/target/spring-petclinic-config-server-4.0.1 #JAR file path
         EXPOSED_PORT: 8888
     image: spring-petclinic-config-server:local # docker Image file export name
     container_name: config-server
@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-discovery-server/target/spring-petclinic-discovery-server-4.0.2
+        ARTIFACT_NAME: spring-petclinic-discovery-server/target/spring-petclinic-discovery-server-4.0.1
         EXPOSED_PORT: 8761
     image: spring-petclinic-discovery-server:local
     ports:
@@ -37,7 +37,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-customers-service/target/spring-petclinic-customers-service-4.0.2
+        ARTIFACT_NAME: spring-petclinic-customers-service/target/spring-petclinic-customers-service-4.0.1
         EXPOSED_PORT: 8081
     image: spring-petclinic-customers-service:local
     ports:
@@ -53,7 +53,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-visits-service/target/spring-petclinic-visits-service-4.0.2
+        ARTIFACT_NAME: spring-petclinic-visits-service/target/spring-petclinic-visits-service-4.0.1
         EXPOSED_PORT: 8082
     image: spring-petclinic-visits-service:local
     ports:
@@ -69,7 +69,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-vets-service/target/spring-petclinic-vets-service-4.0.2
+        ARTIFACT_NAME: spring-petclinic-vets-service/target/spring-petclinic-vets-service-4.0.1
         EXPOSED_PORT: 8083
     image: spring-petclinic-vets-service:local
     ports:
@@ -85,7 +85,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-genai-service/target/spring-petclinic-genai-service-4.0.2
+        ARTIFACT_NAME: spring-petclinic-genai-service/target/spring-petclinic-genai-service-4.0.1
         EXPOSED_PORT: 8084
     image: spring-petclinic-genai-service:local
     ports:
@@ -105,7 +105,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-4.0.2
+        ARTIFACT_NAME: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-4.0.1
         EXPOSED_PORT: 8080
     image: spring-petclinic-api-gateway:local
     ports:
@@ -121,7 +121,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ARTIFACT_NAME: spring-petclinic-admin-server/target/spring-petclinic-admin-server-4.0.2
+        ARTIFACT_NAME: spring-petclinic-admin-server/target/spring-petclinic-admin-server-4.0.1
         EXPOSED_PORT: 9090
     image: spring-petclinic-admin-server:local
     ports:
