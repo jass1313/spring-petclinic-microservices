@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKER_USERNAME: jasbeer0013
-  VERSION: 4.0.2
+  VERSION: 4.0.1
 
 jobs:
   build-and-push:
