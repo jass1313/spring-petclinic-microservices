@@ -59,4 +59,4 @@ jobs:
               kubectl set image deployment/customers-service customers-service=${{ secrets.DOCKER_USERNAME }}/customers-service:${{ env.DOCKERVERSION }} -n petclinic
               kubectl set image deployment/visits-service visits-service=${{ secrets.DOCKER_USERNAME }}/visits-service:${{ env.DOCKERVERSION }} -n petclinic
               kubectl set image deployment/vets-service vets-service=${{ secrets.DOCKER_USERNAME }}/vets-service:${{ env.DOCKERVERSION }} -n petclinic
-              kubectl rollout status deployment --all -n petclinic
+              kubectl rollout status deployment --all -n petclinic 
