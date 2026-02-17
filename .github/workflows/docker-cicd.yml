@@ -49,16 +49,14 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            kubectl set image deployment/config-server config-server=jasbeer0013/config-server:4.0.2 -n petclinic
-            kubectl set image deployment/discovery-server discovery-server=jasbeer0013/discovery-server:4.0.2 -n petclinic
-            kubectl set image deployment/api-gateway api-gateway=jasbeer0013/api-gateway:4.0.2 -n petclinic
-            kubectl set image deployment/customers-service customers-service=jasbeer0013/customers-service:4.0.2 -n petclinic
-            kubectl set image deployment/visits-service visits-service=jasbeer0013/visits-service:4.0.2 -n petclinic
-            kubectl set image deployment/vets-service vets-service=jasbeer0013/vets-service:4.0.2 -n petclinic
-            kubectl set image deployment/admin-server admin-server=jasbeer0013/admin-server:4.0.2 -n petclinic
-            kubectl set image deployment/genai-service genai-service=jasbeer0013/genai-service:4.0.2 -n petclinic
-
-            kubectl rollout status deployment --all -n petclinic
+            script: |
+              kubectl set image deployment/config-server config-server=${{ secrets.DOCKER_USERNAME }}/config-server:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl set image deployment/discovery-server discovery-server=${{ secrets.DOCKER_USERNAME }}/discovery-server:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl set image deployment/api-gateway api-gateway=${{ secrets.DOCKER_USERNAME }}/api-gateway:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl set image deployment/customers-service customers-service=${{ secrets.DOCKER_USERNAME }}/customers-service:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl set image deployment/visits-service visits-service=${{ secrets.DOCKER_USERNAME }}/visits-service:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl set image deployment/vets-service vets-service=${{ secrets.DOCKER_USERNAME }}/vets-service:${{ env.DOCKERVERSION }} -n petclinic
+              kubectl rollout status deployment --all -n petclinic
