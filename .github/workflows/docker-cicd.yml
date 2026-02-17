@@ -51,6 +51,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DOCKER_USERNAME,DOCKERVERSION
           script: |
             kubectl set image deployment/config-server config-server=$DOCKER_USERNAME/config-server:$DOCKERVERSION -n petclinic
             kubectl set image deployment/discovery-server discovery-server=$DOCKER_USERNAME/discovery-server:$DOCKERVERSION -n petclinic
@@ -58,10 +59,11 @@ jobs:
             kubectl set image deployment/customers-service customers-service=$DOCKER_USERNAME/customers-service:$DOCKERVERSION -n petclinic
             kubectl set image deployment/visits-service visits-service=$DOCKER_USERNAME/visits-service:$DOCKERVERSION -n petclinic
             kubectl set image deployment/vets-service vets-service=$DOCKER_USERNAME/vets-service:$DOCKERVERSION -n petclinic
-      
+
             kubectl rollout status deployment/config-server -n petclinic
             kubectl rollout status deployment/discovery-server -n petclinic
             kubectl rollout status deployment/api-gateway -n petclinic
             kubectl rollout status deployment/customers-service -n petclinic
             kubectl rollout status deployment/visits-service -n petclinic
             kubectl rollout status deployment/vets-service -n petclinic
+      
