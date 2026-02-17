@@ -11,7 +11,7 @@ env:
   DOCKERVERSION: 4.0.2
 
 jobs:
-  build-and-push:
+  build-push-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,16 +32,33 @@ jobs:
 
       - name: Build & Push Images
         run: |
-            SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
-            
-            for SERVICE in "${SERVICES[@]}"
-            do
-            docker buildx build \
-            --platform linux/amd64 \
-            -t $DOCKER_USERNAME/$SERVICE:$DOCKERVERSION \
-            --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
-            --build-arg EXPOSED_PORT=8080 \
-            -f docker/Dockerfile . \
-            --push
-            done
+          SERVICES=(config-server discovery-server api-gateway customers-service visits-service vets-service admin-server genai-service)
 
+          for SERVICE in "${SERVICES[@]}"
+          do
+            docker build \
+              -t $DOCKER_USERNAME/$SERVICE:$DOCKERVERSION \
+              --build-arg ARTIFACT_NAME=spring-petclinic-$SERVICE/target/spring-petclinic-$SERVICE-$VERSION.jar \
+              --build-arg EXPOSED_PORT=8080 \
+              -f docker/Dockerfile .
+
+            docker push $DOCKER_USERNAME/$SERVICE:$DOCKERVERSION
+          done
+
+      - name: Deploy to EC2 (Kubernetes Update)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            kubectl set image deployment/config-server config-server=jasbeer0013/config-server:4.0.2 -n petclinic
+            kubectl set image deployment/discovery-server discovery-server=jasbeer0013/discovery-server:4.0.2 -n petclinic
+            kubectl set image deployment/api-gateway api-gateway=jasbeer0013/api-gateway:4.0.2 -n petclinic
+            kubectl set image deployment/customers-service customers-service=jasbeer0013/customers-service:4.0.2 -n petclinic
+            kubectl set image deployment/visits-service visits-service=jasbeer0013/visits-service:4.0.2 -n petclinic
+            kubectl set image deployment/vets-service vets-service=jasbeer0013/vets-service:4.0.2 -n petclinic
+            kubectl set image deployment/admin-server admin-server=jasbeer0013/admin-server:4.0.2 -n petclinic
+            kubectl set image deployment/genai-service genai-service=jasbeer0013/genai-service:4.0.2 -n petclinic
+
+            kubectl rollout status deployment --all -n petclinic
